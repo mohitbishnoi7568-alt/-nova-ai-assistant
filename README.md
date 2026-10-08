@@ -1,15 +1,34 @@
-NOVA ULTIMATE UPGRADE
+# NOVA No-Password Upgrade
 
-1) GitHub Pages: upload contents of website/ to -nova-ai-assistant.
-2) Vercel: upload contents of backend/ to nova-ai-backend.
-3) Vercel Production/Preview env vars:
-OPENAI_API_KEY = your secret OpenAI API key
-OPENAI_MODEL = gpt-6-astra
-ALLOWED_ORIGIN = https://mohitbishnoi7568-alt.github.io
-NOVA_ACCESS_PASSWORD = choose your private website password
-4) Redeploy Vercel.
-5) config.js already points to nova-ai-backend-gamma.vercel.app.
+This package removes the private login/password screen and keeps NOVA directly accessible.
 
-The new frontend sends ordinary questions to the backend correctly. It includes private login, deep-voice controls, themes, futuristic HUD, chat console and Android module buttons.
-Voice is an original deep-assistant style; the exact voice of a movie/character is not cloned. Browser/device voices vary.
-Never put OPENAI_API_KEY in GitHub code.
+## Website
+Upload the contents of `website/` to the GitHub Pages repository `-nova-ai-assistant`.
+
+`config.js` already points to:
+`https://nova-ai-backend-gamma.vercel.app/api/chat`
+
+## Backend
+The `backend/` folder is a Vercel backend. If you replace the current backend, set:
+- `OPENAI_API_KEY` = your secret key
+- `OPENAI_MODEL` = `gpt-6-astra`
+- `ALLOWED_ORIGIN` = `https://mohitbishnoi7568-alt.github.io`
+
+No `NOVA_ACCESS_PASSWORD` is used anywhere.
+
+## Included upgrades
+- No password/login
+- Larger full-screen futuristic HUD
+- Bigger NOVA core and responsive layout
+- General AI chat via backend
+- Hindi/Hinglish voice output
+- Voice wake word: NOVA / नोवा
+- Deep-voice pitch/speed controls
+- 8 themes
+- Fullscreen button
+- Phone/Android module buttons
+- Quick AI commands
+- Jaipur weather/time/date panel
+- LocalStorage theme persistence
+
+Phone controls such as Wi-Fi, Bluetooth, Camera and app launching require the native NOVA Android app; a normal GitHub Pages website cannot silently control Android.
