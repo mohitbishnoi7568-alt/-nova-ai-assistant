@@ -1,3 +1,3 @@
 window.NOVA_CONFIG = {
-  BACKEND_URL: 'https://nova-ai-backend-sand.vercel.app/api/chat'
+  BACKEND_URL: 'https://nova-ai-backend-gamma.vercel.app/api/chat'
 };
