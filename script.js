@@ -34,25 +34,35 @@ async function getWeather(){
   }catch(e){return 'अभी live weather नहीं मिल पाया। Location permission देकर फिर पूछो।'}
 }
 
+function normalizeQuery(q){
+  return String(q||'').toLowerCase().replace(/[?？!！,.،。]/g,' ').replace(/\s+/g,' ').trim();
+}
 function localBrain(q){
-  const x=q.toLowerCase().trim();
+  const x=normalizeQuery(q);
   if(!x)return 'हाँ Mohit, मैं सुन रहा हूँ।';
-  if(/(तुम कौन|तुम्हारा नाम|who are you|your name)/.test(x))return 'मैं NOVA हूँ, Mohit का personal AI assistant। मैं तुम्हारे साथ normal बातचीत, voice commands और supported phone actions में मदद करने के लिए बना हूँ।';
-  if(/(समय|कितने बजे|time|clock)/.test(x))return sayTime();
-  if(/(तारीख|आज कौन सा दिन|date|day)/.test(x))return sayDate();
-  if(/(मौसम|weather|तापमान|temperature|बारिश)/.test(x))return null;
-  if(/(जोक|joke|हंसाओ|funny)/.test(x))return 'Mohit, मेरा processor इतना तेज है कि कभी-कभी Wi-Fi भी मुझसे पूछता है—भाई थोड़ा धीरे चल! 😄';
-  if(/(मूड|खुश|happy|sad|उदास)/.test(x))return 'Boss, mood चाहे जैसा हो, आज एक छोटा सा काम पूरा करके जीत शुरू करते हैं। मैं यहीं हूँ। 😎';
-  if(/(मोटिवेट|motivat|हार मान|confidence)/.test(x))return 'याद रखो: perfect होने का इंतज़ार मत करो। एक छोटा कदम अभी उठाओ—बाकी रास्ता NOVA तुम्हारे साथ तय करेगा।';
-  if(/(धन्यवाद|thank|thanks)/.test(x))return 'Anytime, boss! 😎';
-  if(/(हैलो|hello|hi|hey|नमस्ते)/.test(x))return 'नमस्ते Mohit! NOVA online है। बताओ, आज क्या करना है?';
-  if(/(मदद|help|क्या कर सकते)/.test(x))return 'मैं time, date, live weather, बातचीत, jokes, motivation और supported phone controls संभाल सकता हूँ। Android app में background voice mode भी है।';
+
+  // IMPORTANT: specific intents first, so natural sentences are not mis-routed.
+  if(/(मौसम|weather|तापमान|temperature|बारिश|rain|बादल|cloud|गरमी|गर्मी|ठंड|सर्दी)/.test(x))return null;
+  if(/(कितने बजे|क्या समय|समय क्या|अभी समय|time|clock)/.test(x))return sayTime();
+  if(/(आज की तारीख|आज तारीख|तारीख क्या|date|आज कौन सा दिन|today)/.test(x))return sayDate();
+
+  if(/(तुम कौन|तुम्हारा नाम|आप कौन|who are you|your name|what are you)/.test(x))
+    return 'मैं NOVA हूँ, Mohit का personal AI assistant। मैं तुम्हारी आवाज़ समझकर जवाब देने और supported phone actions में मदद करने के लिए बना हूँ।';
+  if(/(जोक|joke|हंसाओ|funny|मजाक|मज़ाक)/.test(x))
+    return 'Mohit, मेरा processor इतना तेज है कि कभी-कभी Wi-Fi भी मुझसे पूछता है—भाई थोड़ा धीरे चल! 😄';
+  if(/(मूड|खुश|happy|sad|उदास|कैसा महसूस)/.test(x))
+    return 'Boss, mood चाहे जैसा हो, मैं तुम्हारे साथ हूँ। चलो आज कुछ अच्छा करते हैं। 😎';
+  if(/(मोटिवेट|motivat|हार मान|confidence|हिम्मत)/.test(x))
+    return 'याद रखो: perfect होने का इंतज़ार मत करो। एक छोटा कदम अभी उठाओ—बाकी रास्ता हम साथ तय करेंगे।';
+  if(/(धन्यवाद|thank|thanks|शुक्रिया)/.test(x))return 'Anytime, boss! 😎';
+  if(/^(हैलो|hello|hi|hey|नमस्ते|नमस्कार)(\s|$)/.test(x))return 'नमस्ते Mohit! NOVA online है। बताओ, आज क्या करना है?';
+  if(/(मदद|help|क्या कर सकते|commands)/.test(x))return 'मैं time, date, live weather, jokes, motivation, normal बातचीत और supported phone controls संभाल सकता हूँ। Android app में background voice mode भी है।';
   if(/(बैटरी|battery)/.test(x))return window.Android&&Android.getBattery?'बैटरी status check कर रहा हूँ।':'Browser में battery access सीमित है; native NOVA app में यह बेहतर तरीके से जोड़ा जा सकता है।';
   if(/(whatsapp|व्हाट्सएप)/.test(x))return 'WhatsApp खोल रहा हूँ।';
   if(/(youtube|यूट्यूब)/.test(x))return 'YouTube खोल रहा हूँ।';
   if(/(instagram|इंस्टाग्राम)/.test(x))return 'Instagram खोल रहा हूँ।';
   if(/(कैमरा|camera)/.test(x))return 'Camera खोल रहा हूँ।';
-  return 'मैंने तुम्हारी बात समझने की कोशिश की। इस वेबसाइट में secure AI Brain जोड़ने के लिए private server/API endpoint चाहिए; public GitHub page में secret API key रखना सुरक्षित नहीं है। फिलहाल मैं time, date, weather, conversation और built-in commands तुरंत संभाल सकता हूँ।';
+  return 'मैंने तुम्हारी बात सुनी है। इस public website में private AI API key डालना सुरक्षित नहीं है। अभी मैं built-in commands संभाल रहा हूँ; पूरी सामान्य बातचीत के लिए secure AI backend जोड़ना अगला चरण है।';
 }
 
 async function runCommand(q){
