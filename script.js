@@ -102,3 +102,28 @@ $('#speak').onclick=()=>speak('हाँ Mohit, NOVA online है। मैं 
 $('#theme').onclick=()=>{document.documentElement.style.setProperty('--c',getComputedStyle(document.documentElement).getPropertyValue('--c').trim()==='#54e8ff'?'#ff6adf':'#54e8ff');document.documentElement.style.setProperty('--c2','#9b7bff')};
 setInterval(()=>{$('#clock').textContent=new Intl.DateTimeFormat('en-IN',{timeStyle:'medium',hour12:false,timeZone:'Asia/Kolkata'}).format(new Date());$('#date').textContent=new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeZone:'Asia/Kolkata'}).format(new Date())},500);
 if(!navigator.onLine)$('#network').textContent='OFFLINE';
+
+// === NOVA secure AI backend bridge ===
+window.novaAskBackend = async function(message, useWeb=false){
+  const base=(window.NOVA_CONFIG&&window.NOVA_CONFIG.BACKEND_URL||'').replace(/\/$/,'');
+  if(!base)return null;
+  try{
+    const history=Array.from(document.querySelectorAll('#feed p')).slice(0,10).reverse().map(p=>{
+      const t=p.textContent||'',i=t.indexOf(':'); if(i<0)return null;
+      const who=t.slice(0,i).trim().toUpperCase();
+      return {role:who==='YOU'?'user':'assistant',content:t.slice(i+1).trim()};
+    }).filter(Boolean);
+    const r=await fetch(base,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history,useWeb})});
+    if(!r.ok)return null; const d=await r.json(); return d.reply||null;
+  }catch(e){return null;}
+};
+const novaOldRunCommand=window.runCommand;
+window.runCommand=async function(q){
+  const normalized=String(q||'').toLowerCase();
+  const builtIn=/(मौसम|weather|तापमान|temperature|बारिश|rain|कितने बजे|समय|time|clock|तारीख|date|जोक|joke|मजाक|मज़ाक|मोटिवेट|motivat|whatsapp|व्हाट्सएप|youtube|यूट्यूब|instagram|इंस्टाग्राम|camera|कैमरा|wi.?fi|वाई.?फाई|bluetooth|ब्लूटूथ|volume|आवाज़|तुम कौन|तुम्हारा नाम|hello|हैलो|नमस्ते|help|मदद)/.test(normalized);
+  if(!builtIn){
+    const ai=await window.novaAskBackend(q,/latest|today|news|current|अभी|आज|ताज़ा|ताजा/.test(normalized));
+    if(ai)return ai;
+  }
+  return await novaOldRunCommand(q);
+};

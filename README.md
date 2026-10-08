@@ -1,11 +1,32 @@
-# NOVA — Mohit's Personal AI Dashboard
+# NOVA AI Backend — Vercel + OpenAI
 
-This is a separate standalone cinematic/holographic NOVA website. It is intentionally inspired by futuristic AI dashboards rather than copying a specific movie interface.
+This is the secure backend for the NOVA GitHub Pages website. The OpenAI API key stays on the server as an environment variable and is never placed in browser JavaScript.
 
-## Important microphone limitation
-A normal website cannot keep using the microphone invisibly after the browser is backgrounded or the phone is locked. Browser speech recognition also varies by browser/device.
+## Deploy from phone
 
-For true background voice: use the Android NOVA app, grant microphone + notification permissions, and start NOVA while the app is visible. Android then keeps a visible foreground-service notification while the microphone service runs.
+1. Create a new GitHub repository, for example `nova-ai-backend`.
+2. Upload ALL files from this folder, including the `api` folder and `package.json`.
+3. Open Vercel and import that GitHub repository.
+4. In Vercel Project Settings → Environment Variables, add:
+   - `OPENAI_API_KEY` = your secret API key
+   - `OPENAI_MODEL` = `gpt-6-astra` (or another model available to your account)
+   - `ALLOWED_ORIGIN` = `https://mohitbishnoi7568-alt.github.io`
+5. Deploy / redeploy after saving the variables.
+6. Your endpoint will be: `https://YOUR-VERCEL-DOMAIN.vercel.app/api/chat`
+7. Put that endpoint into the NOVA website config as `NOVA_BACKEND_URL`.
 
-## Jarvis-like voice
-The site uses the device's available Hindi TTS voice. An exact voice clone of a movie character/actor is not included. A cinematic, calm assistant voice can be configured through the Android TTS engine.
+IMPORTANT: Never paste the API key into `script.js`, `index.html`, GitHub Pages, or chat. If a key is ever exposed, revoke/rotate it immediately.
+
+## API request
+
+POST /api/chat
+Content-Type: application/json
+
+{
+  "message": "NOVA, black hole kya hota hai?",
+  "history": [],
+  "useWeb": false
+}
+
+Response:
+{"reply":"...","model":"..."}
